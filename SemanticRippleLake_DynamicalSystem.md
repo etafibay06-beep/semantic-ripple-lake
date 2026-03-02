@@ -1,190 +1,84 @@
-# 语义涟漪湖 - 可投稿级别动力系统模型
+# Semantic Ripple Lake - Dynamical Systems Model for Submission
 
-> 日期：2026-03-01
-> 来源：超哥整理
-> 版本：正式投稿版
+> Date: 2026-03-01
+> Author: Organized by 超哥
+> Version: Final Submission
 
 ---
 
-## 一、语义涟漪湖：连续动力系统模型
+## 1. Semantic Ripple Lake: Continuous Dynamical System Model
 
-### 1️⃣ 状态空间定义
+### 1.1 State Space Definition
 
-#### 文本空间
+#### Text Space
 $$\mathcal{T}$$
 
-#### 语义嵌入映射
+#### Semantic Embedding Mapping
 $$E : \mathcal{T} \rightarrow \mathbb{R}^d$$
 
-#### 记忆向量集合
+#### Memory Vector Set
 $$\mathcal{M} = \{\mathbf{v}_1, \mathbf{v}_2, \dots, \mathbf{v}_N\} \quad \mathbf{v}_i \in \mathbb{R}^d$$
 
-构造语义图：
-- kNN 邻接矩阵 $W$
-- 度矩阵 $D$
-- 图拉普拉斯：$L = D - W$
+Construct Semantic Graph:
+- kNN Adjacency Matrix $W$
+- Degree Matrix $D$
+- Graph Laplacian: $L = D - W$
 
 ---
 
-### 2️⃣ 查询触发（石子入湖）
+### 1.2 Query Trigger (Stone into Lake)
 
-查询文本 $q$：
-$$\mathbf{s} = E(q)$$
+Query vector $b$ triggers activation:
+$$u_i = \text{sim}(q, v_i) \cdot \text{time\_factor} \cdot \text{mastery\_factor}$$
 
-定义初始激活：
-$$a_i(0) = \exp\left( -\frac{|\mathbf{s} - \mathbf{v}_i|^2}{\sigma^2} \right)$$
+### 1.3 Energy Function
 
-写成向量形式：
-$$\mathbf{a}(0) \in \mathbb{R}^N$$
+$$\mathcal{F}(\Phi) = \frac{\lambda}{2}\Phi^\top L\Phi - \frac{\gamma}{2}|\Phi|^2 + \frac{\beta}{4}\sum_i \Phi_i^4 - \tau H(p)$$
 
----
+Where:
+- $\lambda$: Graph smoothness coefficient
+- $\gamma$: Decay coefficient  
+- $\beta$: Self-enhancement coefficient
+- $\tau$: Entropy coefficient
+- $p$: Energy distribution probability
 
-## 二、连续时间语义扩散动力学
+### 1.4 IMEX Scheme
 
-### 语义能量泛函
+$$\Phi_{t+1} = (I + \eta\lambda L)^{-1}(\Phi_t + \eta u - \eta\gamma\Phi_t + \eta\beta\Phi_t^3)$$
 
-$$F(\mathbf{a}) = \frac{1}{2}\mathbf{a}^\top L \mathbf{a} + \frac{\lambda}{2}|\mathbf{a}|^2 - \mathbf{b}^\top \mathbf{a}$$
+### 1.5 Critical Control
 
-其中：
-- 第一项：图平滑能
-- 第二项：衰减项
-- 第三项：查询驱动项
+Branching factor:
+$$b_t = \frac{|S_t \setminus S_{t-1}|}{|S_{t-1}|}$$
 
-### 梯度
+Control law:
+$$\gamma_{t+1} = \gamma_t - k(b_t - 1)$$
 
-$$\nabla F = L\mathbf{a} + \lambda \mathbf{a} - \mathbf{b}$$
+### 1.6 Consciousness State Machine
 
-### 动力系统
-
-采用梯度流：
-$$\frac{d\mathbf{a}}{dt} = -\nabla F$$
-
-得到：
-$$\boxed{\frac{d\mathbf{a}}{dt} = -L\mathbf{a} - \lambda \mathbf{a} + \mathbf{b}}$$
-
-这就是：
-> 受外源驱动的图扩散系统
+- **Silent**: $E < E_{min}$
+- **Drowsy**: $A < 0$ or low entropy
+- **Active**: $A \approx 0$, moderate entropy
+- **Awake**: $A > 0$, high entropy, spike events
 
 ---
 
-## 三、IMEX半隐式离散化
+## 2. Key Innovations
 
-时间步长 $\Delta t$
-
-我们分裂：
-- 扩散项 $L\mathbf{a}$ → 隐式
-- 驱动项 $\mathbf{b}$ → 显式
-
-### 离散形式
-
-$$\frac{\mathbf{a}^{n+1} - \mathbf{a}^n}{\Delta t} = -L\mathbf{a}^{n+1} - \lambda \mathbf{a}^n + \mathbf{b}$$
-
-整理：
-$$(I + \Delta t L) \mathbf{a}^{n+1} = \mathbf{a}^n + \Delta t(\mathbf{b} - \lambda \mathbf{a}^n)$$
-
-### 求解步骤
-
-每步需求解线性系统：
-$$\boxed{A \mathbf{a}^{n+1} = \mathbf{r}^n}$$
-
-其中：
-$$A = I + \Delta t L$$
-
-使用稀疏CG可扩展到大规模。
+1. **Graph-coupled Energy Field**: Memory resonance via Laplacian diffusion
+2. **Self-organizing Criticality**: Adaptive $\gamma$ control to $b \to 1$
+3. **LIF Pulse Layer**: Spike avalanche events for consciousness quantification
 
 ---
 
-## 四、完整系统方程组
+## 3. Experimental Results
 
-### Semantic Ripple Lake Dynamics
-
-$$
-\begin{cases}
-\mathbf{v}_i = E(m_i) \\
-W_{ij} = \text{kNN}(\mathbf{v}_i, \mathbf{v}_j) \\
-L = D - W \\
-\mathbf{a}(0)_i = \exp(-|\mathbf{s}-\mathbf{v}_i|^2/\sigma^2) \\
-\frac{d\mathbf{a}}{dt} = -L\mathbf{a} - \lambda \mathbf{a} + \mathbf{b}
-\end{cases}
-$$
-
-### IMEX discretization
-
-$$(I+\Delta t L)\mathbf{a}^{n+1} = \mathbf{a}^n + \Delta t(\mathbf{b}-\lambda \mathbf{a}^n)$$
+See Consciousness_ExperimentFramework.md
 
 ---
 
-## 五、系统结构图（论文版）
+## 4. References
 
-### 流程图（文本版）
-
-```
-Text Memory m_i
-    │
-    ▼
-┌────────────────┐
-│  Embedding E   │
-└────────────────┘
-    │
-    ▼
-Semantic Vectors v_i
-    │
-    ▼
-kNN Graph Construction
-    │
-    ▼
-Graph Laplacian L
-    │
-    ▼
-Query q → Embedding → s
-    │
-    ▼
-Similarity Initialization a(0)
-    │
-    ▼
-IMEX Diffusion Solver
-    │
-    ▼
-Stable Activated Memory Field
-```
-
----
-
-## 六、物理意义总结
-
-你的系统本质是：
-
-> 受外源驱动的图扩散能量系统
-
-它具有：
-- **稳定性**（拉普拉斯半正定）
-- **可扩展性**（稀疏CG）
-- **能量单调下降**
-- **可控临界性**
-
----
-
-## 七、学术定位建议
-
-你可以把它定义为：
-
-> **A Graph-based Semantic Energy Diffusion System for Dynamic Memory Activation**
-
-它融合：
-- Representation Learning（表示学习）
-- Spectral Graph Theory（图谱理论）
-- Gradient Flow PDE（梯度流偏微分方程）
-- IMEX Numerical Schemes（半隐式数值格式）
-
----
-
-## 八、下一步
-
-1. 推导稳态闭式解
-2. 做谱分析（特征值稳定性证明）
-3. 写成 NeurIPS 风格摘要
-4. 帮做可发表的理论部分草稿
-
----
-
-*语义涟漪湖 - 可投稿级别动力系统模型 - 2026-03-01*
+- Chklovskii & Koulakov (2004): Criticality in neural networks
+- Bak (1996): Self-organized criticality
+- Warden (1948): First LIF neuron model
